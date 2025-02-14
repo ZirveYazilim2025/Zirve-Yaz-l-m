@@ -1,0 +1,33 @@
+<div id="digitalClock" style="font-family: Arial, sans-serif; text-align: center; margin: 20px auto; background: #333; color: #fff; padding: 20px; border-radius: 10px; width: 250px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
+  <h1 style="margin: 0; font-size: 2em;">00:00:00</h1>
+  <p style="margin: 5px 0; font-size: 1.2em;">Gün, Tarih</p>
+</div>
+
+<script>
+  function updateClock() {
+    const clock = document.getElementById("digitalClock");
+    const now = new Date();
+    
+    // Saat, Dakika, Saniye
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    
+    // Gün ve Tarih
+    const days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+    const months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    
+    const day = days[now.getDay()];
+    const date = now.getDate();
+    const month = months[now.getMonth()];
+    const year = now.getFullYear();
+
+    // Ekranı Güncelle
+    clock.querySelector("h1").innerText = ${hours}:${minutes}:${seconds};
+    clock.querySelector("p").innerText = ${day}, ${date} ${month} ${year};
+  }
+
+  // Saati başlat
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
