@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f4f4f4;
+        }
+        .container {
+            width: 400px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .social-login {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .social-login button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .google {
+            background: #db4437;
+            color: white;
+        }
+        .facebook {
+            background: #4267B2;
+            color: white;
+        }
+        .link-btn {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter your email" oninput="validateEmail(this)">
+            <span class="error" id="email-error"></span>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <div class="form-group">
+            <label for="captcha">Captcha: <span id="captcha-text"></span></label>
+            <input type="text" id="captcha" placeholder="Enter captcha">
+            <span class="error" id="captcha-error"></span>
+        </div>
+        <button class="btn" onclick="handleLogin()">Login</button>
+        <div class="social-login">
+            <button class="google">Login with Google</button>
+            <button class="facebook">Login with Facebook</button>
+        </div>
+        <a href="#register-container" class="link-btn" onclick="switchToRegister()">Don't have an account? Register</a>
+    </div>
+
+    <div class="container" id="register-container" style="display: none;">
+        <h2>Register</h2>
+        <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="Enter your email" oninput="validateEmail(this)">
+            <span class="error" id="reg-email-error"></span>
+        </div>
+        <div class="form-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" placeholder="Enter your password">
+            <span class="error" id="password-error"></span>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" placeholder="Confirm your password">
+            <span class="error" id="confirm-password-error"></span>
+        </div>
+        <div class="form-group">
+            <label for="reg-captcha">Captcha: <span id="reg-captcha-text"></span></label>
+            <input type="text" id="reg-captcha" placeholder="Enter captcha">
+            <span class="error" id="reg-captcha-error"></span>
+        </div>
+        <button class="btn" onclick="handleRegister()">Register</button>
+        <div class="social-login">
+            <button class="google">Register with Google</button>
+            <button class="facebook">Register with Facebook</button>
+        </div>
+        <a href="#login-container" class="link-btn" onclick="switchToLogin()">Already have an account? Login</a>
+    </div>
+
+    <script>
+        function switchToRegister() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('register-container').style.display = 'block';
+            generateCaptcha('reg-captcha-text');
+        }
+        function switchToLogin() {
+            document.getElementById('register-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+            generateCaptcha('captcha-text');
+        }
+
+        function validateEmail(input) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const errorSpan = input.id === 'email' ? 'email-error' : 'reg-email-error';
+            if (!emailPattern.test(input.value)) {
+                document.getElementById(errorSpan).innerText = 'Invalid email format.';
+                input.style.borderColor = 'red';
+            } else {
+                document.getElementById(errorSpan).innerText = '';
+                input.style.borderColor = '#ccc';
+            }
+        }
+
+        function isValidPassword(password) {
+            const passwordPattern = /^(?=.[A-Z])(?=.[!@#$%^&])[A-Za-z\d!@#$%^&]{6,}$/;
+            return passwordPattern.test(password);
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const captchaInput = document.getElementById('captcha').value;
+            const captchaText = document.getElementById('captcha-text').innerText;
+
+            if (email && password && captchaInput) {
+                if (isValidEmail(email) && captchaInput === captchaText) {
+                    alert('Login successful! Redirecting to the site...');
+                    window.location.href = 'https://tiyiklogoyazilim.blogspot.com/';
+                } else {
+                    if (!isValidEmail(email)) {
+                        document.getElementById('email-error').innerText = 'Please enter a valid email.';
+                    }
+                    if (captchaInput !== captchaText) {
+                        document.getElementById('captcha-error').innerText = 'Captcha does not match.';
+                    }
+                }
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        function handleRegister() {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const captchaInput = document.getElementById('reg-captcha').value;
+            const captchaText = document.getElementById('reg-captcha-text').innerText;
+
+            if (email && password && confirmPassword && captchaInput) {
+                if (isValidEmail(email) && isValidPassword(password) && password === confirmPassword && captchaInput === captchaText) {
+                    alert('Registration successful! Redirecting to the site...');
+                    window.location.href = 'https://tiyiklogoyazilim.blogspot.com/';
+                } else {
+                    if (!isValidEmail(email)) {
+                        document.getElementById('reg-email-error').innerText = 'Please enter a valid email.';
+                    }
+                    if (!isValidPassword(password)) {
+                        document.getElementById('password-error').innerText = 'Password must be at least 6 characters, include one uppercase letter and one special character.';
+                    }
+                    if (password !== confirmPassword) {
+                        document.getElementById('confirm-password-error').innerText = 'Passwords do not match.';
+                    }
+                    if (captchaInput !== captchaText) {
+                        document.getElementById('reg-captcha-error').innerText = 'Captcha does not match.';
+                    }
+                }
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(email);
+        }
+
+        function generateCaptcha(id) {
+            const captcha = Math.random().toString(36).substring(2, 8);
+            document.getElementById(id).innerText = captcha;
+        }
+
+        window.onload = function() {
+            generateCaptcha('captcha-text');
+            generateCaptcha('reg-captcha-text');
+        };
+    </script>
+</body>
+</html>
