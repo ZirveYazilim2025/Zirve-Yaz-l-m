@@ -1,0 +1,150 @@
+<style>
+    #voiceBtn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #voiceBtn:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    #voiceBtn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    #result {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+</style>
+
+<button id="voiceBtn">🎙 Sesli Komut</button>
+<p id="result">Durum: Bekleniyor...</p>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!window.SpeechRecognition) {
+      alert("Tarayıcınız ses tanımayı desteklemiyor!");
+      document.getElementById("voiceBtn").disabled = true;
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    const btn = document.getElementById("voiceBtn");
+    const resultText = document.getElementById("result");
+
+    let isListening = false;
+
+    btn.addEventListener("click", function() {
+      if (isListening) {
+        recognition.stop();
+        isListening = false;
+        btn.innerHTML = "🎙 Sesli Komut";
+        resultText.innerText = "Dinleme durduruldu.";
+      } else {
+        recognition.start();
+        isListening = true;
+        btn.innerHTML = "🔴 Dinleniyor...";
+        resultText.innerText = "Komut bekleniyor...";
+      }
+    });
+
+    recognition.onstart = function() {
+      resultText.innerText = "Dinleme başladı...";
+    };
+
+    recognition.onresult = function(event) {
+      const command = event.results[0][0].transcript.toLowerCase();
+      resultText.innerText = "Komut: " + command;
+
+      const speech = new SpeechSynthesisUtterance();
+
+      switch (true) {
+        case command.includes("ana sayfa"):
+          speech.text = "Ana sayfaya yönlendiriyorum.";
+          window.location.href = "SEN EKLE";
+          break;
+
+        case command.includes("iletişim"):
+          speech.text = "İletişim sayfasına gidiyoruz.";
+          window.location.href = "SEN EKLE";
+          break;
+
+        case command.includes("hakkında"):
+          speech.text = "Hakkında sayfasına yönlendiriyorum.";
+          window.location.href = "SEN EKLE";
+          break;
+
+        case command.includes("arama yap"):
+          let searchQuery = command.replace("arama yap", "").trim();
+          if (searchQuery.length > 0) {
+            speech.text = searchQuery + " için arama yapıyorum.";
+            window.location.href = `SEN EKLE${searchQuery}`;
+          } else {
+            speech.text = "Lütfen aramak istediğiniz kelimeyi söyleyin.";
+          }
+          break;
+
+        case command.includes("blogu paylaş"):
+          speech.text = "Blog bağlantısını kopyaladım, paylaşabilirsiniz.";
+          navigator.clipboard.writeText(window.location.href);
+          break;
+
+        case command.includes("modu aç"):
+          speech.text = "Sürekli dinleme modu açıldı.";
+          recognition.continuous = true;
+          break;
+
+        case command.includes("modu kapat"):
+          speech.text = "Sürekli dinleme modu kapatıldı.";
+          recognition.continuous = false;
+          break;
+
+        case command.includes("son yazıyı oku"):
+          readLastBlogPost();
+          return;
+
+        default:
+          speech.text = "Bu komutu anlamadım.";
+      }
+
+      window.speechSynthesis.speak(speech);
+    };
+
+    recognition.onerror = function(event) {
+      resultText.innerText = "Hata: " + event.error;
+      btn.innerHTML = "🎙 Sesli Komut";
+      isListening = false;
+    };
+
+    function readLastBlogPost() {
+      let latestPost = document.querySelector(".post-title a");
+      if (latestPost) {
+        let speech = new SpeechSynthesisUtterance(latestPost.innerText);
+        window.speechSynthesis.speak(speech);
+      } else {
+        let speech = new SpeechSynthesisUtterance("Son yazı bulunamadı.");
+        window.speechSynthesis.speak(speech);
+      }
+    }
+  });
+</script>
