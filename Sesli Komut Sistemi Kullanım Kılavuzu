@@ -1,0 +1,39 @@
+Sesli Komut Sistemi Kullanım Kılavuzu
+Giriş
+Bu sistem, web sitenizi sesli komutlarla yönetmenize olanak tanır. Kullanıcılar, belirli komutları söyleyerek sayfalar arasında gezinebilir, arama yapabilir ve blog içeriğini paylaşabilirler.
+
+Sistem Gereksinimleri
+Google Chrome, Microsoft Edge veya Web Speech API destekleyen bir tarayıcı kullanmanız gerekir.
+Cihazınızda mikrofon erişimi açık olmalıdır.
+Başlangıç
+"🎙 Sesli Komut" butonuna tıklayın.
+Sistem dinleme moduna geçtiğinde "🔴 Dinleniyor..." yazısını göreceksiniz.
+Bir komut söyleyin ve sistemin yanıt vermesini bekleyin.
+Kullanılabilir Komutlar
+Sayfa Yönlendirme Komutları
+"Ana sayfa" → Ana sayfaya yönlendirir.
+"İletişim" → İletişim sayfasına gider.
+"Hakkında" → Hakkında sayfasına yönlendirir.
+Arama Komutu
+"Arama yap [kelime]" → Belirttiğiniz kelimeye göre blog içerisinde arama yapar.
+Örnek: "Arama yap yapay zeka" → Yapay zeka ile ilgili yazıları listeler.
+Paylaşım Komutu
+"Blogu paylaş" → Blog bağlantısını panoya kopyalar.
+Sürekli Dinleme Modu
+"Modu aç" → Sesli komutları sürekli dinleme moduna alır.
+"Modu kapat" → Sürekli dinleme modunu kapatır.
+Son Blog Yazısını Okuma
+Sistem, en son blog yazısının başlığını sesli olarak okuyabilir.
+
+Hata Yönetimi
+"Tarayıcınız ses tanımayı desteklemiyor!" uyarısı alırsanız farklı bir tarayıcı deneyin.
+"Hata" mesajı alırsanız internet bağlantınızı kontrol edin veya sayfayı yenileyerek tekrar deneyin.
+Destek
+Sistemle ilgili sorularınız veya önerileriniz için iletişime geçebilirsiniz.
+
+
+
+
+
+
+
