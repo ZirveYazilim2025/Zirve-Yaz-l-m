@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker Simülatörü</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            color: #0f0;
+            font-family: "Courier New", monospace;
+            overflow: hidden;
+        }
+        .matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: -1;
+        }
+        .terminal {
+            width: 100%;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .input-line {
+            display: flex;
+        }
+        .prompt {
+            color: #0f0;
+            margin-right: 5px;
+        }
+        .input {
+            background: black;
+            border: none;
+            color: #0f0;
+            font-family: "Courier New", monospace;
+            width: 100%;
+            outline: none;
+        }
+        .login-screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #0f0;
+            font-size: 20px;
+        }
+        .login-input {
+            background: black;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-size: 20px;
+            padding: 5px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix" id="matrix"></canvas>
+
+    <div class="login-screen" id="loginScreen">
+        <div>Giriş Yap: root</div>
+        <input type="text" class="login-input" id="loginInput" placeholder="Kullanıcı Adı" autofocus>
+        <button onclick="checkLogin()">Giriş</button>
+    </div>
+
+    <div class="terminal" id="terminal" style="display: none;">
+        <div id="output">Hacker Simülatörü başlatılıyor...\nKali Linux Terminali\nKomut gir: scan, brute-force, ddos, phish, malware, decrypt, clear</div>
+        <div class="input-line">
+            <span class="prompt">root@webos:~#</span>
+            <input type="text" class="input" id="commandInput" autofocus onkeypress="handleCommand(event)">
+        </div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById("terminal");
+        const commandInput = document.getElementById("commandInput");
+        const output = document.getElementById("output");
+        const loginScreen = document.getElementById("loginScreen");
+        const loginInput = document.getElementById("loginInput");
+
+        function checkLogin() {
+            if (loginInput.value.trim() === "root") {
+                loginScreen.style.display = "none";
+                terminal.style.display = "block";
+                startMatrix();
+            } else {
+                alert("Yanlış kullanıcı adı!");
+            }
+        }
+
+        function printLine(text) {
+            output.innerHTML += "\n" + text;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function fakeLoading(text, callback) {
+            let i = 0;
+            const interval = setInterval(() => {
+                printLine(text + ".".repeat(i % 4));
+                i++;
+                if (i > 10) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 300);
+        }
+
+        function handleCommand(event) {
+            if (event.key === "Enter") {
+                let command = commandInput.value.trim();
+                printLine(`root@webos:~# ${command}`);
+                commandInput.value = "";
+
+                if (command === "clear") {
+                    output.innerHTML = "";
+                } else if (command === "scan") {
+                    fakeLoading("Ağ taraması yapılıyor", () => {
+                        printLine("IP Adresi: 192.168.1.1");
+                        printLine("Açık Portlar: 22, 80, 443");
+                        printLine("Sistem: Linux Server");
+                    });
+                } else if (command === "brute-force") {
+                    fakeLoading("Şifre kırma işlemi başlatılıyor", () => {
+                        printLine("Şifre: admin123");
+                        printLine("Giriş başarılı!");
+                    });
+                } else if (command === "ddos") {
+                    fakeLoading("DDoS saldırısı başlatılıyor", () => {
+                        printLine("Hedef: 192.168.1.1");
+                        printLine("Paketler gönderiliyor... [██████████] %100");
+                        printLine("Saldırı tamamlandı!");
+                    });
+                } else if (command === "phish") {
+                    fakeLoading("Kimlik avı saldırısı hazırlanıyor", () => {
+                        printLine("Sahte giriş sayfası oluşturuldu: www.fakebank.com");
+                        printLine("Kimlik avı saldırısı başarıyla başlatıldı!");
+                    });
+                } else if (command === "malware") {
+                    fakeLoading("Virüs yükleniyor", () => {
+                        printLine("Sahte virüs: ransomware.exe yüklendi!");
+                        printLine("Sistem dosyaları şifreleniyor...");
+                    });
+                } else if (command === "decrypt") {
+                    fakeLoading("Şifre çözme işlemi başlatılıyor", () => {
+                        printLine("Şifreli dosyalar: 10/10");
+                        printLine("Tüm dosyalar başarıyla çözüldü!");
+                    });
+                } else {
+                    printLine("Bilinmeyen komut: " + command);
+                }
+            }
+        }
+
+        function startMatrix() {
+            const canvas = document.getElementById("matrix");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height);
+            }
+
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#0f0";
+                ctx.font = fontSize + "px monospace";
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            setInterval(draw, 50);
+        }
+    </script>
+</body>
+</html>
