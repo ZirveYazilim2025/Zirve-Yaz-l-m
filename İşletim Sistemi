@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Web OS - Giriş</title>
+<style>
+  body, html {
+    margin:0; padding:0; height:100%;
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: white;
+  }
+  #loginScreen {
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background: #1e1e1e;
+  }
+  #loginScreen input[type="password"] {
+    font-size: 1.2rem;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border:none;
+    width: 200px;
+  }
+  #loginScreen button {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border:none;
+    border-radius: 5px;
+    background:#2ecc71;
+    color:#121212;
+    cursor:pointer;
+  }
+  #errorMsg {
+    color: #e74c3c;
+    margin-top: 10px;
+  }
+
+  #desktop {
+    display:none;
+    height:100vh;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/6/6a/Kali-Linux-Logo.png') no-repeat center center fixed;
+    background-size: 150px 150px;
+    color: white;
+  }
+
+  /* Basit pencere stilleri */
+  .window {
+    position: absolute;
+    background: #222;
+    border: 2px solid #555;
+    border-radius: 5px;
+    box-shadow: 0 0 10px black;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+  .window-header {
+    background: #333;
+    padding: 5px 10px;
+    cursor: move;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .window-header .title {
+    font-weight: bold;
+  }
+  .window-header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  .window-content {
+    padding: 10px;
+    flex-grow: 1;
+    overflow: auto;
+    background: #111;
+  }
+
+  /* Görev çubuğu */
+  #taskbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 30px;
+    background: #222;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    color: #ddd;
+  }
+  #taskbar span {
+    margin-left: auto;
+  }
+
+  button.app-btn {
+    margin-right: 10px;
+    padding: 5px 10px;
+    background: #2c3e50;
+    border: none;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  button.app-btn:hover {
+    background: #34495e;
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h1>Web OS Giriş</h1>
+  <input type="password" id="passwordInput" placeholder="Şifreyi giriniz" />
+  <button id="loginBtn">Giriş</button>
+  <div id="errorMsg"></div>
+</div>
+
+<div id="desktop">
+  <div id="taskbar">
+    <button class="app-btn" onclick="openCalculator()">Hesap Makinesi</button>
+    <button class="app-btn" onclick="openNotepad()">Not Defteri</button>
+    <button class="app-btn" onclick="openFileManager()">Dosya Yöneticisi</button>
+    <button class="app-btn" onclick="openTerminal()">Terminal</button>
+    <button class="app-btn" onclick="openMinesweeper()">Mayın Tarlası</button>
+    <button class="app-btn" onclick="openSettings()">Ayarlar</button>
+    <span id="dateTime"></span>
+  </div>
+</div>
+
+<script>
+  const correctPassword = 'zirve_2025';
+
+  const loginScreen = document.getElementById('loginScreen');
+  const desktop = document.getElementById('desktop');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginBtn = document.getElementById('loginBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const dateTimeSpan = document.getElementById('dateTime');
+
+  loginBtn.onclick = () => {
+    if(passwordInput.value === correctPassword) {
+      loginScreen.style.display = 'none';
+      desktop.style.display = 'block';
+      errorMsg.textContent = '';
+      passwordInput.value = '';
+      startDateTimeUpdater();
+    } else {
+      errorMsg.textContent = 'Şifre yanlış!';
+      passwordInput.value = '';
+    }
+  };
+
+  passwordInput.addEventListener('keydown', e => {
+    if(e.key === 'Enter') loginBtn.click();
+  });
+
+  function startDateTimeUpdater() {
+    function update() {
+      const now = new Date();
+      dateTimeSpan.textContent = now.toLocaleString('tr-TR');
+    }
+    update();
+    setInterval(update, 1000);
+  }
+
+  // --- Basit uygulama pencereleri ---
+
+  function createWindow(title, width=400, height=300) {
+    const win = document.createElement('div');
+    win.classList.add('window');
+    win.style.width = width + 'px';
+    win.style.height = height + 'px';
+    win.style.top = '50px';
+    win.style.left = '50px';
+
+    // Başlık çubuğu
+    const header = document.createElement('div');
+    header.classList.add('window-header');
+    const titleElem = document.createElement('div');
+    titleElem.className = 'title';
+    titleElem.textContent = title;
+    header.appendChild(titleElem);
+
+    const btnClose = document.createElement('button');
+    btnClose.textContent = '×';
+    btnClose.title = 'Kapat';
+    btnClose.onclick = () => {
+      document.body.removeChild(win);
+    };
+    header.appendChild(btnClose);
+
+    win.appendChild(header);
+
+    const content = document.createElement('div');
+    content.classList.add('window-content');
+    win.appendChild(content);
+
+    document.body.appendChild(win);
+
+    // Pencereyi sürükle
+    let isDragging = false, dragX, dragY;
+    header.onmousedown = e => {
+      isDragging = true;
+      dragX = e.clientX - win.offsetLeft;
+      dragY = e.clientY - win.offsetTop;
+      document.onmousemove = e2 => {
+        if(!isDragging) return;
+        win.style.left = (e2.clientX - dragX) + 'px';
+        win.style.top = (e2.clientY - dragY) + 'px';
+      };
+      document.onmouseup = () => {
+        isDragging = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
+
+    return {win, content};
+  }
+
+  // Hesap Makinesi
+  function openCalculator() {
+    const {win, content} = createWindow('Hesap Makinesi', 320, 370);
+    content.innerHTML = `
+      <input type="text" id="calcDisplay" readonly style="width:100%; font-size:1.5rem; text-align:right; margin-bottom:10px; padding:5px; box-sizing:border-box;" />
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:5px;">
+        <button>7</button><button>8</button><button>9</button><button>/</button>
+        <button>4</button><button>5</button><button>6</button><button>*</button>
+        <button>1</button><button>2</button><button>3</button><button>-</button>
+        <button>0</button><button>.</button><button>=</button><button>+</button>
+        <button id="calcClear" style="grid-column: span 4; background:#f33; color:white;">Temizle</button>
+      </div>
+    `;
+    const display = content.querySelector('#calcDisplay');
+    const buttons = content.querySelectorAll('button:not(#calcClear)');
+    buttons.forEach(btn => {
+      btn.onclick = () => {
+        if(btn.textContent === '=') {
+          try {
+            display.value = eval(display.value) ?? '';
+          } catch {
+            display.value = 'Hata';
+          }
+        } else {
+          display.value += btn.textContent;
+        }
+      };
+    });
+    content.querySelector('#calcClear').onclick = () => {
+      display.value = '';
+    };
+  }
+
+  // Not Defteri
+  const files = {}; // Dosyaları tutar
+
+  function openNotepad() {
+    const {win, content} = createWindow('Not Defteri', 500, 400);
+    content.innerHTML = `
+      <textarea id="notepadText" style="width:100%; height: calc(100% - 40px); box-sizing: border-box;"></textarea>
+      <button id="saveNote" style="margin-top: 5px;">Kaydet</button>
+    `;
+    const textarea = content.querySelector('#notepadText');
+    const saveBtn = content.querySelector('#saveNote');
+    saveBtn.onclick = () => {
+      const filename = prompt('Dosya adı girin (örn: not1.txt):');
+      if(filename) {
+        files[filename] = textarea.value;
+        alert(`"${filename}" kaydedildi.`);
+      }
+    };
+  }
+
+  // Dosya Yöneticisi
+  function openFileManager() {
+    const {win, content} = createWindow('Dosya Yöneticisi', 400, 400);
+
+    function refreshFileList() {
+      fileList.innerHTML = '';
+      const keys = Object.keys(files);
+      if(keys.length === 0) {
+        fileList.textContent = 'Kayıtlı dosya yok.';
+        return;
+      }
+      keys.forEach(fname => {
+        const li = document.createElement('div');
+        li.style.marginBottom = '8px';
+        li.textContent = fname;
+        li.style.cursor = 'pointer';
+        li.style.userSelect = 'none';
+        li.onclick = () => {
+          if(confirm(`"${fname}" dosyasını aç?`)) {
+            openFile(fname);
+          }
+        };
+        fileList.appendChild(li);
+      });
+    }
+    function openFile(fname) {
+      const {win:fileWin, content:winContent} = createWindow(`Dosya: ${fname}`, 400, 300);
+      winContent.innerHTML = `<pre style="white-space: pre-wrap;">${files[fname]}</pre>`;
+    }
+
+    content.innerHTML = `<div id="fileList"></div>`;
+    const fileList = content.querySelector('#fileList');
+    refreshFileList();
+  }
+
+  // Terminal (basit)
+  function openTerminal() {
+    const {win, content} = createWindow('Terminal', 500, 300);
+    content.innerHTML = `
+      <div id="termOutput" style="background:black; color:#0f0; height:80%; overflow:auto; padding:5px; font-family: monospace;"></div>
+      <input type="text" id="termInput" placeholder="Komut girin" style="width:100%; box-sizing:border-box; margin-top:5px; color:black;" />
+    `;
+    const output = content.querySelector('#termOutput');
+    const input = content.querySelector('#termInput');
+
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter') {
+        const cmd = input.value.trim();
+        output.innerHTML += `<div>&gt; ${cmd}</div>`;
+        input.value = '';
+
+        if(cmd === 'help') {
+          output.innerHTML += `<div>Komutlar: help, date, clear</div>`;
+        } else if(cmd === 'date') {
+          output.innerHTML += `<div>${new Date().toString()}</div>`;
+        } else if(cmd === 'clear') {
+          output.innerHTML = '';
+        } else {
+          output.innerHTML += `<div>Bilinmeyen komut: ${cmd}</div>`;
+        }
+        output.scrollTop = output.scrollHeight;
+      }
+    });
+  }
+
+  // Mayın Tarlası (çok basit)
+  function openMinesweeper() {
+    const {win, content} = createWindow('Mayın Tarlası', 400, 400);
+
+    // Basit 8x8 mayın tarlası
+    const size = 8;
+    const minesCount = 10;
+    let grid = [];
+    let revealed = [];
+
+    function createGrid() {
+      grid = [];
+      revealed = [];
+      for(let i=0;i<size*size;i++) {
+        grid.push(0);
+        revealed.push(false);
+      }
+      // Mayın yerleştir
+      let placed = 0;
+      while(placed < minesCount) {
+        let pos = Math.floor(Math.random() * size*size);
+        if(grid[pos] === 0) {
+          grid[pos] = -1;
+          placed++;
+        }
+      }
+      // Komşu sayıları
+      for(let i=0;i<size*size;i++) {
+        if(grid[i] === -1) continue;
+        let count = 0;
+        const neighbors = getNeighbors(i);
+        neighbors.forEach(n => {
+          if(grid[n] === -1) count++;
+        });
+        grid[i] = count;
+      }
+    }
+    function getNeighbors(i) {
+      const neighbors = [];
+      const x = i % size;
+      const y = Math.floor(i / size);
+      for(let dx=-1;dx<=1;dx++) {
+        for(let dy=-1;dy<=1;dy++) {
+          if(dx===0 && dy===0) continue;
+          const nx = x+dx;
+          const ny = y+dy;
+          if(nx>=0 && nx<size && ny>=0 && ny<size) {
+            neighbors.push(ny*size+nx);
+          }
+        }
+      }
+      return neighbors;
+    }
+    function reveal(i) {
+      if(revealed[i]) return;
+      revealed[i] = true;
+      if(grid[i] === 0) {
+        getNeighbors(i).forEach(n => reveal(n));
+      }
+    }
+    function render() {
+      board.innerHTML = '';
+      for(let i=0;i<size*size;i++) {
+        const cell = document.createElement('button');
+        cell.style.width = '40px';
+        cell.style.height = '40px';
+        cell.style.fontSize = '18px';
+        cell.style.padding = '0';
+        cell.style.margin = '1px';
+        if(!revealed[i]) {
+          cell.textContent = '';
+          cell.style.background = '#666';
+          cell.onclick = () => {
+            if(grid[i] === -1) {
+              alert('Mayına bastınız! Oyun bitti.');
+              createGrid();
+              revealed.fill(false);
+              render();
+            } else {
+              reveal(i);
+              render();
+            }
+          };
+        } else {
+          if(grid[i] === -1) {
+            cell.textContent = '💣';
+            cell.style.background = '#f33';
+          } else if(grid[i] > 0) {
+            cell.textContent = grid[i];
+            cell.style.background = '#ccc';
+          } else {
+            cell.style.background = '#eee';
+          }
+          cell.disabled = true;
+        }
+        board.appendChild(cell);
+      }
+    }
+
+    content.innerHTML = `<div id="board" style="display:flex; flex-wrap: wrap; width: 328px; margin:auto; margin-top:10px;"></div>`;
+    const board = content.querySelector('#board');
+    createGrid();
+    render();
+  }
+
+  // Ayarlar (basit)
+  function openSettings() {
+    const {win, content} = createWindow('Ayarlar', 300, 200);
+    content.innerHTML = `
+      <p>Bu bölümde ayarlar olacak.</p>
+      <button onclick="alert('Henüz ayar yok.')">Tamam</button>
+    `;
+  }
+</script>
+
+</body>
+</html>
